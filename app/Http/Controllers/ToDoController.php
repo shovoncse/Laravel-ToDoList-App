@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Todo;
 
-class TodDoController extends Controller
+class ToDoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +14,9 @@ class TodDoController extends Controller
      */
     public function index()
     {
-        //
+        // $todos = Todo::all();
+        $todos = Todo::orderBy('created_at', 'desc')->get();;
+        return view('todos.index')->with('todos', $todos);
     }
 
     /**
@@ -23,7 +26,7 @@ class TodDoController extends Controller
      */
     public function create()
     {
-        //
+        return view('todos.create');
     }
 
     /**
@@ -34,7 +37,19 @@ class TodDoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this -> validate($request, [
+            'text' => 'required'
+        ]);
+
+        //Craete To do
+        $todo = new Todo;
+        $todo ->text = $request -> input('text');
+        $todo ->body = $request -> input('body');
+        $todo ->due = $request -> input('due');
+        
+        $todo -> save();
+
+        return redirect('/')->with('success', 'Todo Created');
     }
 
     /**
@@ -45,7 +60,8 @@ class TodDoController extends Controller
      */
     public function show($id)
     {
-        //
+        $todo = Todo::find($id);
+        return view('todos.show')->with('todo', $todo);
     }
 
     /**
@@ -56,7 +72,8 @@ class TodDoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $todo = Todo::find($id);
+        return view('todos.edit')->with('todo', $todo);
     }
 
     /**
@@ -68,7 +85,21 @@ class TodDoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
+        $this -> validate($request, [
+            'text' => 'required'
+        ]);
+
+        //Update To do
+        $todo = Todo::find($id);
+        $todo ->text = $request -> input('text');
+        $todo ->body = $request -> input('body');
+        $todo ->due = $request -> input('due');
+        
+        $todo -> save();
+
+        return redirect('/')->with('success', 'Todo Updated');
+
     }
 
     /**
@@ -79,6 +110,10 @@ class TodDoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //Update To do
+        $todo = Todo::find($id);
+        $todo -> delete();
+
+        return redirect('/')->with('success', 'Todo Deleted');
     }
 }
